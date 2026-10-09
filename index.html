@@ -46,6 +46,17 @@
 
         input[type="checkbox"] { accent-color: var(--accent-color); }
 
+        /* 🐹 타이머 창 안을 돌아다니는 캐릭터 */
+        #shimejiStage > div { will-change: left, transform; }
+        .shimeji-walk { animation: shimejiBobWalk 0.55s ease-in-out infinite; }
+        .shimeji-hurry { animation: shimejiBobHurry 0.15s ease-in-out infinite; }
+        .shimeji-rest, .shimeji-sleep { animation: shimejiBreathe 2.2s ease-in-out infinite; }
+        .shimeji-wake { animation: none; }
+        @keyframes shimejiBobWalk { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 2px; } }
+        @keyframes shimejiBobHurry { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 7px; } }
+        @keyframes shimejiBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.92); } }
+        .shimeji-size-btn.active { background: var(--accent-color); border-color: var(--accent-color); color: var(--btn-text, white); }
+
         @media (max-width: 380px) {
             .header-inline h2 { font-size: 15px; }
             .card { padding: 12px; } h3 { margin-bottom: 10px; }
@@ -63,32 +74,38 @@
                 <div style="display:flex; gap:6px; align-items:center;">
                     <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="forcePomoMode(true)" title="집중 시간으로 수동 전환">🍅 집중</button>
                     <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="forcePomoMode(false)" title="휴식 시간으로 수동 전환">☕ 휴식</button>
+                    <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="openShimejiSettings()" title="캐릭터 설정">⚙️</button>
                     <button class="theme-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="라이트/다크 모드 전환">🌙</button>
                 </div>
             </div>
 
-            <div style="margin-bottom: 14px; text-align: center; padding: 0 12px 12px 12px;">
-                <div id="pomoTimerDisplay" style="font-size: 48px; font-weight: 900; color: var(--pomo-timer-text); font-variant-numeric: tabular-nums; margin: 4px 0;">25:00</div>
+            <!-- 타이머 카드의 아래 점선이 곧 캐릭터가 걷는 '바닥'이다. 캐릭터는 글자/버튼 뒤(배경 레이어)를 지나다닌다. -->
+            <div style="margin-bottom: 0; text-align: center; padding: 0 12px 26px 12px; position: relative; overflow: hidden; border-radius: 12px; border-bottom: 1px dashed var(--border-color);">
+                <div id="shimejiStage" style="position:absolute; inset:0; z-index:0; pointer-events:none;"></div>
 
-                <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
-                    <button class="btn btn-primary" style="width:80px; margin:0;" onclick="masterStartTimer()" id="pomoStartBtn">Start</button>
-                    <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterPauseTimer()" id="pomoPauseBtn">Pause</button>
-                    <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterResetTimer()" id="pomoResetBtn">Reset</button>
-                </div>
+                <div style="position:relative; z-index:1;">
+                    <div id="pomoTimerDisplay" style="font-size: 48px; font-weight: 900; color: var(--pomo-timer-text); font-variant-numeric: tabular-nums; margin: 4px 0;">25:00</div>
 
-                <div style="font-size:11px; color:var(--text-sub); display:flex; gap:12px; justify-content:center; align-items:center;">
-                    <label>집중: <input type="number" id="pomoFocusInput" value="25" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
-                    <label>휴식: <input type="number" id="pomoBreakInput" value="5" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
+                    <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+                        <button class="btn btn-primary" style="width:80px; margin:0;" onclick="masterStartTimer()" id="pomoStartBtn">Start</button>
+                        <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterPauseTimer()" id="pomoPauseBtn">Pause</button>
+                        <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterResetTimer()" id="pomoResetBtn">Reset</button>
+                    </div>
+
+                    <div style="font-size:11px; color:var(--text-sub); display:flex; gap:12px; justify-content:center; align-items:center;">
+                        <label>집중: <input type="number" id="pomoFocusInput" value="25" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
+                        <label>휴식: <input type="number" id="pomoBreakInput" value="5" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
+                    </div>
                 </div>
             </div>
 
             <!-- 🔌 Notion 미연동 시(개인 ID 미입력) 이 안내만 보이고, 아래 작업 목록 영역은 통째로 숨겨진다 -->
-            <div id="pomo-local-note" style="display:none; margin: 0 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--bg-color); border: 1px dashed var(--border-color); font-size: 11px; color: #fff; line-height: 1.5; text-align:center;">
+            <div id="pomo-local-note" style="display:none; margin: 12px 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--bg-color); border: 1px dashed var(--border-color); font-size: 11px; color: #fff; line-height: 1.5; text-align:center;">
                 <span id="pomo-local-note-text"></span>
             </div>
 
             <div id="pomo-sync-area">
-                <div id="pomo-new-task-card" style="margin-bottom: 16px; padding: 16px 4px 0 4px; border-top: 1px dashed var(--border-color);">
+                <div id="pomo-new-task-card" style="margin-bottom: 16px; padding: 16px 4px 0 4px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
                         <h3 style="margin:0; font-size:14px; font-weight:600; color:var(--text-main); white-space:nowrap;">새 작업 추가 (New Task)</h3>
                         <!-- Action 체크박스. 값(공부/업무/…)은 Notion Action DB의 같은 이름 페이지와 연결된다. Action 속성을 쓸 수 있을 때만 보인다. -->
@@ -119,6 +136,36 @@
         </div>
     </div>
 
+    <!-- 🐹 캐릭터 설정 모달 -->
+    <div id="shimeji-settings-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:var(--card-bg); border-radius:16px; padding:18px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h2 style="font-size:15px; margin:0; color:var(--text-main);">🐹 캐릭터 설정</h2>
+                <button onclick="closeShimejiSettings()" style="border:none; background:transparent; font-size:18px; cursor:pointer; color:var(--text-sub); padding:2px 6px;">✕</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px; line-height:1.6;">
+                이미지를 올리면 캐릭터가 <b>타이머 창 안을 돌아다녀요.</b> (Start: 걷기 · 1분 남으면 서두르기 · 휴식 모드: 수면 · Pause: 휴식)<br>
+                이미지를 올리지 않은 칸은 <b>기본 캐릭터(양)</b>가 대신 보이고(흐리게 표시된 칸), 왼쪽을 보는 이미지를 기준으로 움직여요. 캐릭터는 최대 <b id="shimejiMaxLabel">3</b>개까지 등록할 수 있어요.
+            </div>
+            <div style="font-size:11px; color:var(--warn-text); background:var(--warn-bg); border-radius:8px; padding:8px 10px; margin-bottom:14px; line-height:1.6;">
+                ⚠️ 캐릭터는 <b>이 브라우저에만 저장</b>돼요. 다른 기기·다른 브라우저와는 연동되지 않으니 기기마다 따로 등록해주세요.<br>
+                ⚠️ 사이트 데이터를 삭제하거나, 오래 접속하지 않거나, 저장 공간이 부족하면 <b>캐릭터가 갑자기 사라질 수 있어요.</b> 원본 이미지는 따로 보관해주세요.
+            </div>
+
+            <div style="margin-bottom:14px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-main); margin-bottom:6px;">캐릭터 크기</div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn-secondary shimeji-size-btn" data-size="S" style="flex:1; margin:0; padding:8px; font-size:11px;" onclick="setShimejiSize('S')">S (40px)</button>
+                    <button class="btn-secondary shimeji-size-btn" data-size="M" style="flex:1; margin:0; padding:8px; font-size:11px;" onclick="setShimejiSize('M')">M (84px)</button>
+                    <button class="btn-secondary shimeji-size-btn" data-size="L" style="flex:1; margin:0; padding:8px; font-size:11px;" onclick="setShimejiSize('L')">L (128px)</button>
+                </div>
+            </div>
+
+            <div id="shimeji-char-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+            <button class="btn btn-secondary" id="shimejiAddCharBtn" style="margin-top:12px; margin-bottom:0;" onclick="addShimejiCharacter()">+ 캐릭터 추가</button>
+        </div>
+    </div>
+
     <script>
         // ✨ 노션에서 쿼리 파라미터(?key=)를 해시(#key=)로 변환하거나 잘라먹는 경우를 대비해 두 가지 방식 모두 지원
         const urlParams = new URLSearchParams(window.location.search);
@@ -134,6 +181,7 @@
         window.onload = function () {
             if (localStorage.getItem('darkMode') === 'true') { document.documentElement.setAttribute('data-theme', 'dark'); const btn = document.getElementById('darkModeBtn'); if (btn) btn.innerText = '☀️'; }
             applyPomoModeTheme(true);
+            initShimeji();
             updatePomoDisplay();
             loadPomodoroTasks();
         };
@@ -179,6 +227,7 @@
             const m = Math.floor(pomoTimeLeft / 60);
             const s = pomoTimeLeft % 60;
             document.getElementById('pomoTimerDisplay').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            updateShimejiState();
         }
 
         function updatePomoSettings() {
@@ -219,6 +268,7 @@
             if (isPomoRunning) {
                 masterPauseTimer();
             } else {
+                shimejiPausedByUser = false; // 실행 중이 아닐 때의 수동 전환은 미리보기이므로 일시정지 취급하지 않음
                 updatePomoDisplay();
             }
         }
@@ -251,6 +301,8 @@
                 }
 
                 isPomoRunning = true;
+                shimejiPausedByUser = false;
+                updateShimejiState();
                 if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
                 pomoInterval = setInterval(() => {
@@ -289,6 +341,8 @@
             if (!isPomoRunning) return;
             isPomoRunning = false;
             clearInterval(pomoInterval);
+            shimejiPausedByUser = true;
+            updateShimejiState();
 
             if (notionConnected && linkedTaskIds.size > 0) {
                 try {
@@ -305,6 +359,7 @@
         function masterResetTimer() {
             masterPauseTimer();
             isFocusMode = true;
+            shimejiPausedByUser = false; // 리셋은 '일시정지'가 아니라 새 시작이므로 기본 걷기 상태로
             const focusMins = parseInt(document.getElementById('pomoFocusInput').value) || 25;
             pomoTimeLeft = focusMins * 60;
             applyPomoModeTheme();
@@ -556,6 +611,389 @@
             input.disabled = false;
             btn.disabled = false;
             btn.innerText = 'Add';
+        }
+
+        // ==========================================
+        // 🐹 타이머 창 캐릭터 (이 브라우저의 localStorage에만 저장 - 기기 간 연동 없음)
+        // ==========================================
+        // walk/hurry는 2프레임을 번갈아 보여줘서 걷는 모션을 내고, sleep/wake는 정지 포즈 1장이다.
+        // rest는 이미지를 최대 2개 등록할 수 있고 등록된 것 중 하나를 랜덤으로 보여준다.
+        // rest는 ① 걷는 중 캐릭터마다 랜덤 타이밍에 잠깐 끼워지는 휴식, ② Pause를 눌렀을 때 전체 캐릭터의 공통 상태로 들어간다.
+        const SHIMEJI_DEFAULT_EMOJI = { walk: '🐹', hurry: '💨', rest: '🧘', sleep: '😴', wake: '⏰' };
+        const SHIMEJI_FRAME_INTERVAL = { walk: 260, hurry: 90 };
+        const SHIMEJI_MAX_CHARACTERS = 3;
+        const SHIMEJI_GIF_MAX_BYTES = 1024 * 1024; // GIF는 원본 그대로 저장되어 브라우저 저장 공간을 많이 쓰므로 작게 제한
+        const SHIMEJI_SLOT_SUFFIXES = ['_walk_1', '_walk_2', '_hurry_1', '_hurry_2', '_rest_1', '_rest_2', '_sleep', '_wake'];
+        const SHIMEJI_SIZES = { S: 40, M: 84, L: 128 };
+        const SHIMEJI_CARDS = [
+            { title: '걷기 (2프레임)', slots: [{ suffix: 'walk_1', label: '프레임1' }, { suffix: 'walk_2', label: '프레임2' }] },
+            { title: '휴식 (등록된 것 중 랜덤)', slots: [{ suffix: 'rest_1', label: '옵션1' }, { suffix: 'rest_2', label: '옵션2' }] },
+            { title: '서두르기 (2프레임)', slots: [{ suffix: 'hurry_1', label: '프레임1' }, { suffix: 'hurry_2', label: '프레임2' }] },
+            { title: '수면 · 기상', slots: [{ suffix: 'sleep', label: '수면' }, { suffix: 'wake', label: '기상' }] },
+        ];
+
+        // 샘플 화면(?demo=1)에서 등록된 캐릭터가 없을 때만 보여주는 기본 샘플 캐릭터. 파일 경로는 상대경로여야 GitHub Pages 하위 주소에서도 동작한다.
+        const SHIMEJI_SAMPLE_ID = 'sample';
+        const SHIMEJI_SAMPLE_IMAGES = {
+            walk_1: 'character/small/character_walk1.png', walk_2: 'character/small/character_walk2.png',
+            hurry_1: 'character/small/character_rush1.png', hurry_2: 'character/small/character_rush2.png',
+            rest_1: 'character/small/character_rest1.png', rest_2: 'character/small/character_rest2.png',
+            sleep: 'character/small/character_sleep1.png', wake: 'character/small/character_wake1.png',
+        };
+
+        let shimejiState = 'walk';
+        let shimejiPausedByUser = false;
+        let shimejiCharacterIds = [];
+        let shimejiRuntime = [];
+        let shimejiLoopId = null;
+
+        // 임베드/사생활 보호 모드에서는 저장소 접근이 막힐 수 있어서 모두 예외를 삼키는 래퍼로 접근한다.
+        function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+        function lsSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (e) { return false; } }
+        function lsRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
+        // 무대에 올릴 캐릭터 id 목록. 샘플 화면이고 등록된 캐릭터가 하나도 없으면 샘플 캐릭터 1개를 보여준다.
+        function shimejiStageIds() { return (isDemo && shimejiCharacterIds.length === 0) ? [SHIMEJI_SAMPLE_ID] : shimejiCharacterIds; }
+        // slot 예: 'walk_1', 'rest_2', 'sleep'
+        // 직접 올린 이미지가 없는 칸은 기본 샘플 캐릭터(양) 이미지로 대신 보여준다.
+        function getShimejiImage(id, slot) {
+            if (id === SHIMEJI_SAMPLE_ID) return SHIMEJI_SAMPLE_IMAGES[slot] || null;
+            return lsGet(`shimejiImg_${id}_${slot}`) || SHIMEJI_SAMPLE_IMAGES[slot] || null;
+        }
+
+        // 샘플 화면은 샘플 캐릭터가 잘 보이도록 기본 크기를 M으로 둔다.
+        function getShimejiSize() { const s = lsGet('shimejiSize'); return SHIMEJI_SIZES[s] ? s : (isDemo ? 'M' : 'S'); }
+        function setShimejiSize(size) {
+            if (!SHIMEJI_SIZES[size]) return;
+            lsSet('shimejiSize', size);
+            applyShimejiSize();
+            renderShimejiSizeButtons();
+        }
+        function applyShimejiSize() {
+            const px = SHIMEJI_SIZES[getShimejiSize()];
+            shimejiRuntime.forEach(r => {
+                const sprite = document.getElementById('shimejiSprite-' + r.id);
+                if (sprite) { sprite.style.width = px + 'px'; sprite.style.height = px + 'px'; }
+                const emojiEl = document.getElementById('shimejiEmoji-' + r.id);
+                if (emojiEl) emojiEl.style.fontSize = Math.round(px * 0.65) + 'px';
+            });
+        }
+        function renderShimejiSizeButtons() {
+            const size = getShimejiSize();
+            document.querySelectorAll('.shimeji-size-btn').forEach(b => b.classList.toggle('active', b.dataset.size === size));
+        }
+
+        // 처음에는 캐릭터가 없는 상태로 시작한다. "+ 캐릭터 추가"를 눌러야 생긴다.
+        function loadShimejiCharacterIds() {
+            try {
+                const stored = JSON.parse(lsGet('shimejiCharacterIds') || 'null');
+                if (Array.isArray(stored)) return stored.slice(0, SHIMEJI_MAX_CHARACTERS);
+            } catch (e) {}
+            return [];
+        }
+        function saveShimejiCharacterIds() {
+            if (!lsSet('shimejiCharacterIds', JSON.stringify(shimejiCharacterIds))) {
+                alert('이 환경에서는 브라우저 저장이 막혀 있어 캐릭터를 저장할 수 없어요.');
+            }
+        }
+        function getShimejiCharacterName(id, fallbackIndex) { return lsGet('shimejiCharName_' + id) || `캐릭터 ${fallbackIndex}`; }
+
+        function parseShimejiSlotKey(fullKey) {
+            for (const suffix of SHIMEJI_SLOT_SUFFIXES) {
+                if (fullKey.endsWith(suffix)) {
+                    return { charId: fullKey.slice(0, -suffix.length), group: suffix.replace(/^_/, '').replace(/_[12]$/, '') };
+                }
+            }
+            return { charId: fullKey, group: null };
+        }
+
+        function initShimeji() {
+            const maxLabel = document.getElementById('shimejiMaxLabel');
+            if (maxLabel) maxLabel.innerText = SHIMEJI_MAX_CHARACTERS;
+            shimejiCharacterIds = loadShimejiCharacterIds();
+            rebuildShimejiStage();
+            renderShimejiCharList();
+            renderShimejiSizeButtons();
+            if (!shimejiLoopId) shimejiLoopId = setInterval(shimejiTick, 50);
+        }
+
+        function openShimejiSettings() {
+            renderShimejiCharList();
+            renderShimejiSizeButtons();
+            document.getElementById('shimeji-settings-modal').style.display = 'flex';
+        }
+        function closeShimejiSettings() { document.getElementById('shimeji-settings-modal').style.display = 'none'; }
+
+        function addShimejiCharacter() {
+            if (shimejiCharacterIds.length >= SHIMEJI_MAX_CHARACTERS) { alert(`캐릭터는 최대 ${SHIMEJI_MAX_CHARACTERS}개까지 추가할 수 있어요.`); return; }
+            shimejiCharacterIds.push('c' + Date.now());
+            saveShimejiCharacterIds();
+            rebuildShimejiStage();
+            renderShimejiCharList();
+        }
+
+        function removeShimejiCharacter(id) {
+            shimejiCharacterIds = shimejiCharacterIds.filter(x => x !== id);
+            saveShimejiCharacterIds();
+            SHIMEJI_SLOT_SUFFIXES.forEach(suffix => lsRemove(`shimejiImg_${id}${suffix}`));
+            lsRemove('shimejiCharName_' + id);
+            rebuildShimejiStage();
+            renderShimejiCharList();
+        }
+
+        function renameShimejiCharacter(id, name) {
+            const trimmed = (name || '').trim();
+            if (trimmed) lsSet('shimejiCharName_' + id, trimmed);
+            else lsRemove('shimejiCharName_' + id);
+        }
+
+        function rebuildShimejiStage() {
+            const stage = document.getElementById('shimejiStage');
+            if (!stage) return;
+            stage.innerHTML = '';
+            const px = SHIMEJI_SIZES[getShimejiSize()];
+            shimejiRuntime = shimejiStageIds().map(id => {
+                const sprite = document.createElement('div');
+                sprite.id = 'shimejiSprite-' + id;
+                sprite.style.cssText = `position:absolute; bottom:0; width:${px}px; height:${px}px; display:flex; align-items:center; justify-content:center;`;
+                sprite.innerHTML = `<img id="shimejiImg-${id}" src="" alt="" style="display:none; width:100%; height:100%; object-fit:contain;"><span id="shimejiEmoji-${id}" style="font-size:${Math.round(px * 0.65)}px; line-height:1;">🐹</span>`;
+                stage.appendChild(sprite);
+                return {
+                    id, x: 10 + Math.random() * 60, targetX: null, dir: 1, frame: 1,
+                    lastFrameSwitch: 0, pauseUntil: 0, resting: false, restUntil: 0, restFrame: 1,
+                    speedMult: 0.85 + Math.random() * 0.3,
+                };
+            });
+            shimejiRuntime.forEach(r => setShimejiCharacterVisual(r));
+        }
+
+        function renderShimejiCharList() {
+            const list = document.getElementById('shimeji-char-list');
+            if (!list) return;
+            const addBtn = document.getElementById('shimejiAddCharBtn');
+            if (shimejiCharacterIds.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:20px 10px; color:var(--text-sub); font-size:12px; border:1px dashed var(--border-color); border-radius:12px;">아직 캐릭터가 없어요.<br>아래 "+ 캐릭터 추가"를 누르면 시작돼요.</div>`;
+                if (addBtn) addBtn.style.display = 'block';
+                return;
+            }
+            list.innerHTML = shimejiCharacterIds.map((id, idx) => {
+                const name = getShimejiCharacterName(id, idx + 1);
+                const cardsHtml = SHIMEJI_CARDS.map(card => {
+                    const slotsHtml = card.slots.map(slot => {
+                        const fullKey = `${id}_${slot.suffix}`;
+                        return `
+                            <div style="text-align:center;">
+                                <div id="shimejiThumb-${fullKey}" style="width:40px; height:40px; margin:0 auto 4px auto; border-radius:9px; background:var(--bg-color); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden;"></div>
+                                <div style="font-size:9px; color:var(--text-sub); margin-bottom:2px;">${slot.label}</div>
+                                <button class="btn-secondary" style="padding:3px; font-size:9px; width:100%; margin:0 0 2px 0;" onclick="document.getElementById('shimejiInput-${fullKey}').click()">업로드</button>
+                                <button class="btn-secondary" style="padding:3px; font-size:9px; width:100%; margin:0;" onclick="removeShimejiImage('${fullKey}')">삭제</button>
+                                <input type="file" id="shimejiInput-${fullKey}" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="handleShimejiUpload(event, '${fullKey}')">
+                            </div>
+                        `;
+                    }).join('');
+                    return `
+                        <div style="padding:8px; border:1px solid var(--border-color); border-radius:10px;">
+                            <div style="font-size:11px; font-weight:700; color:var(--text-main); text-align:center; margin-bottom:6px;">${card.title}</div>
+                            <div style="display:flex; gap:6px; justify-content:center;">${slotsHtml}</div>
+                        </div>
+                    `;
+                }).join('');
+                return `
+                    <div style="border:1px solid var(--border-color); border-radius:12px; padding:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+                            <input type="text" value="${escapeHtml(name)}" placeholder="캐릭터 ${idx + 1}" style="font-size:13px; font-weight:700; border:1px solid transparent; background:transparent; color:var(--text-main); flex:1; min-width:0; padding:4px 6px; border-radius:6px;" onchange="renameShimejiCharacter('${id}', this.value)">
+                            <button class="btn-secondary" style="padding:4px 8px; font-size:10px; width:auto; margin:0; flex-shrink:0;" onclick="removeShimejiCharacter('${id}')">삭제</button>
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">${cardsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+
+            shimejiCharacterIds.forEach(id => {
+                SHIMEJI_CARDS.forEach(card => card.slots.forEach(slot => renderShimejiThumb(`${id}_${slot.suffix}`)));
+            });
+            if (addBtn) addBtn.style.display = shimejiCharacterIds.length >= SHIMEJI_MAX_CHARACTERS ? 'none' : 'block';
+        }
+
+        // 타이머 상태(집중/휴식, 남은 시간, 실행·일시정지 여부)로 캐릭터 상태를 계산한다.
+        function updateShimejiState() {
+            let next;
+            if (shimejiPausedByUser) {
+                next = 'rest';
+            } else if (isFocusMode) {
+                next = (isPomoRunning && pomoTimeLeft < 60) ? 'hurry' : 'walk';
+            } else {
+                next = (isPomoRunning && pomoTimeLeft < 60) ? 'wake' : 'sleep';
+            }
+            if (next !== shimejiState) setShimejiState(next);
+        }
+
+        function setShimejiState(state) {
+            shimejiState = state;
+            shimejiRuntime.forEach(r => {
+                r.frame = 1;
+                r.lastFrameSwitch = 0;
+                r.resting = false;
+                r.restUntil = 0;
+                if (state === 'rest') r.restFrame = Math.random() < 0.5 ? 1 : 2;
+                setShimejiCharacterVisual(r);
+                updateShimejiCharacterClass(r);
+            });
+        }
+
+        function isShimejiResting(r) { return shimejiState === 'rest' || (shimejiState === 'walk' && r.resting); }
+
+        function updateShimejiCharacterClass(r) {
+            const sprite = document.getElementById('shimejiSprite-' + r.id);
+            if (!sprite) return;
+            sprite.className = isShimejiResting(r) ? 'shimeji-rest' : 'shimeji-' + shimejiState;
+        }
+
+        function resolveShimejiRestSlot(r) {
+            const primary = `rest_${r.restFrame}`;
+            const fallback = `rest_${r.restFrame === 1 ? 2 : 1}`;
+            if (getShimejiImage(r.id, primary)) return primary;
+            if (getShimejiImage(r.id, fallback)) return fallback;
+            return null;
+        }
+
+        // 캐릭터의 현재 상태에 맞는 이미지를 보여준다. 이미지가 없으면 기본 이모지.
+        function setShimejiCharacterVisual(r) {
+            const imgEl = document.getElementById('shimejiImg-' + r.id);
+            const emojiEl = document.getElementById('shimejiEmoji-' + r.id);
+            if (!imgEl || !emojiEl) return;
+            let dataUrl = null, emojiKey;
+            if (isShimejiResting(r)) {
+                emojiKey = 'rest';
+                const slotSuffix = resolveShimejiRestSlot(r);
+                if (slotSuffix) dataUrl = getShimejiImage(r.id, slotSuffix);
+            } else if (shimejiState === 'walk' || shimejiState === 'hurry') {
+                emojiKey = shimejiState;
+                dataUrl = getShimejiImage(r.id, `${shimejiState}_${r.frame}`);
+            } else {
+                emojiKey = shimejiState;
+                dataUrl = getShimejiImage(r.id, shimejiState);
+            }
+            if (dataUrl) { imgEl.src = dataUrl; imgEl.style.display = 'block'; emojiEl.style.display = 'none'; }
+            else { imgEl.style.display = 'none'; imgEl.src = ''; emojiEl.style.display = 'block'; emojiEl.innerText = SHIMEJI_DEFAULT_EMOJI[emojiKey]; }
+        }
+
+        function shimejiTick() {
+            const stage = document.getElementById('shimejiStage');
+            if (!stage || shimejiRuntime.length === 0) return;
+            const stageWidth = stage.clientWidth;
+            const now = Date.now();
+
+            shimejiRuntime.forEach(r => {
+                const sprite = document.getElementById('shimejiSprite-' + r.id);
+                if (!sprite) return;
+                const maxX = Math.max(0, stageWidth - sprite.offsetWidth);
+
+                if (shimejiState === 'sleep' || shimejiState === 'rest') {
+                    sprite.style.left = Math.min(r.x, maxX) + 'px';
+                    return;
+                }
+
+                if (shimejiState === 'walk' && r.resting) {
+                    if (now < r.restUntil) { sprite.style.left = Math.min(r.x, maxX) + 'px'; return; }
+                    r.resting = false;
+                    updateShimejiCharacterClass(r);
+                }
+
+                if ((shimejiState === 'walk' || shimejiState === 'hurry') && now - r.lastFrameSwitch >= SHIMEJI_FRAME_INTERVAL[shimejiState]) {
+                    r.frame = r.frame === 1 ? 2 : 1;
+                    r.lastFrameSwitch = now;
+                    setShimejiCharacterVisual(r);
+                }
+
+                if (now < r.pauseUntil) return;
+
+                if (r.targetX === null || Math.abs(r.x - r.targetX) < 2) {
+                    if (shimejiState === 'walk' && Math.random() < 0.3) {
+                        r.resting = true;
+                        r.restFrame = Math.random() < 0.5 ? 1 : 2;
+                        r.restUntil = now + 900 + Math.random() * 1600;
+                        r.pauseUntil = r.restUntil;
+                        setShimejiCharacterVisual(r);
+                        updateShimejiCharacterClass(r);
+                        return;
+                    }
+                    r.targetX = Math.random() * maxX;
+                    if (shimejiState === 'walk' && Math.random() < 0.25) { r.pauseUntil = now + 400 + Math.random() * 800; }
+                    return;
+                }
+                r.dir = r.targetX > r.x ? 1 : -1;
+                const stepBase = shimejiState === 'hurry' ? 4 : (shimejiState === 'wake' ? 0.6 : 1.4);
+                const step = stepBase * r.speedMult;
+                r.x = Math.max(0, Math.min(maxX, r.x + r.dir * step));
+                sprite.style.left = r.x + 'px';
+                // 캐릭터 이미지는 보통 왼쪽을 기본 방향으로 그려서, 오른쪽으로 이동할 때 뒤집어준다.
+                sprite.style.transform = `scaleX(${r.dir >= 0 ? -1 : 1})`;
+            });
+        }
+
+        function handleShimejiUpload(event, slotKey) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { alert('이미지 파일만 업로드할 수 있어요.'); event.target.value = ''; return; }
+            if (file.size > 8 * 1024 * 1024) { alert('이미지 용량은 8MB 이하로 올려주세요.'); event.target.value = ''; return; }
+            if (file.type === 'image/gif' && file.size > SHIMEJI_GIF_MAX_BYTES) { alert('GIF는 1MB 이하만 올릴 수 있어요. 더 작은 GIF나 PNG를 사용해주세요.'); event.target.value = ''; return; }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                // GIF는 캔버스에 그리면 애니메이션이 사라지므로 원본 그대로 저장
+                if (file.type === 'image/gif') { saveShimejiImage(slotKey, e.target.result); return; }
+                const img = new Image();
+                img.onload = () => {
+                    const maxSize = 160;
+                    let { width, height } = img;
+                    if (width > maxSize || height > maxSize) {
+                        if (width > height) { height = Math.round(height * maxSize / width); width = maxSize; }
+                        else { width = Math.round(width * maxSize / height); height = maxSize; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    saveShimejiImage(slotKey, canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => alert('이미지를 불러올 수 없어요. 다른 파일을 시도해주세요.');
+                img.src = e.target.result;
+            };
+            reader.onerror = () => alert('이미지를 읽는 중 오류가 발생했어요.');
+            reader.readAsDataURL(file);
+        }
+
+        function saveShimejiImage(slotKey, dataUrl) {
+            if (!lsSet('shimejiImg_' + slotKey, dataUrl)) {
+                alert('이미지 저장에 실패했어요. 브라우저 저장 공간이 부족하거나 이 환경에서 저장이 막혀 있을 수 있어요. 더 작은 이미지를 사용해주세요.');
+                return;
+            }
+            renderShimejiThumb(slotKey);
+            const { charId } = parseShimejiSlotKey(slotKey);
+            const r = shimejiRuntime.find(x => x.id === charId);
+            if (r) setShimejiCharacterVisual(r);
+        }
+
+        function removeShimejiImage(slotKey) {
+            lsRemove('shimejiImg_' + slotKey);
+            const input = document.getElementById('shimejiInput-' + slotKey); if (input) input.value = '';
+            renderShimejiThumb(slotKey);
+            const { charId } = parseShimejiSlotKey(slotKey);
+            const r = shimejiRuntime.find(x => x.id === charId);
+            if (r) setShimejiCharacterVisual(r);
+        }
+
+        function renderShimejiThumb(slotKey) {
+            const thumb = document.getElementById('shimejiThumb-' + slotKey);
+            if (!thumb) return;
+            const dataUrl = lsGet('shimejiImg_' + slotKey);
+            const { group } = parseShimejiSlotKey(slotKey);
+            if (dataUrl) { thumb.innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:contain;">`; return; }
+            // 올린 이미지가 없으면 기본 샘플(양) 이미지를 흐리게 보여준다.
+            const slot = slotKey.slice(parseShimejiSlotKey(slotKey).charId.length + 1);
+            const sample = SHIMEJI_SAMPLE_IMAGES[slot];
+            if (sample) { thumb.innerHTML = `<img src="${sample}" title="기본 이미지" style="width:100%; height:100%; object-fit:contain; opacity:0.45;">`; }
+            else { thumb.innerText = SHIMEJI_DEFAULT_EMOJI[group] || '❓'; }
         }
     </script>
 </body>
