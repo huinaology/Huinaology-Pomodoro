@@ -58,6 +58,8 @@ Huinaology 노션 템플릿용 **뽀모도로 타이머 부가기능**입니다.
 https://내프로젝트이름.vercel.app?key=mypomodoro123
 ```
 
+> 💡 **Notion 연동 없이 타이머만** 쓰실 거라면 `?key=` 대신 주소 끝에 `?timer=1`을 붙여주세요. 안내 문구 없이 타이머만 깔끔하게 보입니다. (예: `https://내프로젝트이름.vercel.app?timer=1`)
+
 > ⚠️ 임베드 화면에 **"vercel.com이(가) 차단되었습니다"** 가 뜬다면, Vercel 프로젝트의 **Settings → Deployment Protection**에서 **Vercel Authentication**을 끄고 저장해주세요. 주소도 Domains에 표시된 `프로젝트이름.vercel.app` 형태를 사용해야 합니다.
 
 ## 🛠️ 업데이트 방법

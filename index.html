@@ -126,6 +126,8 @@
         const secretKey = urlParams.get('key') || hashParams.get('key') || '';
         // 노션 템플릿에 넣는 샘플용 주소(?demo=1): 서버 호출 없이 샘플 안내만 보여준다.
         const isDemo = (urlParams.get('demo') || hashParams.get('demo')) === '1';
+        // Notion 연동 없이 타이머만 쓰는 주소(?timer=1): 서버 호출도, 안내 문구도 없이 깨끗하게 보여준다.
+        const isPlainTimer = (urlParams.get('timer') || hashParams.get('timer')) === '1';
 
         let notionConnected = false; // Notion 연동 여부. mode=list 응답으로 판별한다.
 
@@ -391,17 +393,19 @@
             notionConnected = false;
             const messages = {
                 demo: '👀 샘플 화면입니다. 타이머는 그대로 사용해볼 수 있어요.<br>작업 추가·목록 같은 Notion 연동 기능은 <b>내 위젯 주소로 교체</b>하면 사용할 수 있습니다.',
-                nokey: '🔑 주소 끝에 <b>?key=설정한비밀번호</b>를 붙여주세요. (Vercel의 <b>WIDGET_SECRET</b> 값)<br>지금은 기본 타이머로만 동작 중입니다.',
+                nokey: '🔑 주소 끝에 <b>?key=설정한비밀번호</b>를 붙여주세요. (Vercel의 <b>WIDGET_SECRET</b> 값)<br>지금은 기본 타이머로만 동작 중입니다.<br>💡 Notion 연동 없이 타이머만 쓰실 거라면 주소 끝에 <b>?timer=1</b>을 붙이면 이 안내가 사라집니다.',
                 badkey: '🔑 인증 키가 맞지 않습니다.<br>주소의 <b>?key=</b> 값이 Vercel의 <b>WIDGET_SECRET</b> 값과 같은지 확인해주세요.',
-                notconfigured: '🔌 Notion 연동이 설정되지 않아 기본 타이머로만 동작 중입니다.<br>내 Notion Pomodoro DB와 연동하려면 위젯 배포 시 <b>NOTION_TOKEN</b> / <b>POMODORO_DB_ID</b>를 입력해주세요.',
+                notconfigured: '🔌 Notion 연동이 설정되지 않아 기본 타이머로만 동작 중입니다.<br>내 Notion Pomodoro DB와 연동하려면 위젯 배포 시 <b>NOTION_TOKEN</b> / <b>POMODORO_DB_ID</b>를 입력해주세요.<br>💡 연동 없이 타이머만 쓰실 거라면 주소 끝에 <b>?timer=1</b>을 붙이면 이 안내가 사라집니다.',
                 error: '⚠️ Notion 연결 중 오류가 발생해 기본 타이머로만 동작 중입니다.<br><b>Pomodoro DB · Daily DB · Action DB에 통합(Connections) 연결이 빠지지 않았는지</b> 먼저 확인해주세요.<br>그 외에 토큰·DB ID, 템플릿 속성 구성도 확인이 필요합니다.' + (detail ? '<br><span style="opacity:0.85;">' + escapeHtml(detail) + '</span>' : ''),
                 network: '⚠️ 서버에 연결할 수 없어 기본 타이머로만 동작 중입니다.'
             };
             document.getElementById('pomo-local-note-text').innerHTML = messages[kind] || messages.network;
             setSyncAreaVisible(false);
+            if (kind === 'plain') document.getElementById('pomo-local-note').style.display = 'none';
         }
 
         async function loadPomodoroTasks() {
+            if (isPlainTimer) { showLocalMode('plain'); return; }
             if (isDemo) { showLocalMode('demo'); return; }
             if (!secretKey) { showLocalMode('nokey'); return; }
 
