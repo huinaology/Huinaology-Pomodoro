@@ -83,8 +83,8 @@
             </div>
 
             <!-- 🔌 Notion 미연동 시(개인 ID 미입력) 이 안내만 보이고, 아래 작업 목록 영역은 통째로 숨겨진다 -->
-            <div id="pomo-local-note" style="display:none; margin: 0 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--bg-color); border: 1px dashed var(--border-color); font-size: 11px; color: var(--text-sub); line-height: 1.5; text-align:center;">
-                🔌 Notion 연동이 설정되지 않아 기본 타이머로만 동작 중입니다.<br>내 Notion Pomodoro DB와 연동하려면 위젯 배포 시 <b>NOTION_TOKEN</b> / <b>POMODORO_DB_ID</b>를 입력해주세요.
+            <div id="pomo-local-note" style="display:none; margin: 0 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--bg-color); border: 1px dashed var(--border-color); font-size: 11px; color: #fff; line-height: 1.5; text-align:center;">
+                <span id="pomo-local-note-text"></span>
             </div>
 
             <div id="pomo-sync-area">
@@ -124,6 +124,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
         const secretKey = urlParams.get('key') || hashParams.get('key') || '';
+        // 노션 템플릿에 넣는 샘플용 주소(?demo=1): 서버 호출 없이 샘플 안내만 보여준다.
+        const isDemo = (urlParams.get('demo') || hashParams.get('demo')) === '1';
 
         let notionConnected = false; // Notion 연동 여부. mode=list 응답으로 판별한다.
 
@@ -384,19 +386,35 @@
             document.getElementById('pomo-local-note').style.display = visible ? 'none' : 'block';
         }
 
+        // 연동을 쓸 수 없을 때 기본 타이머 모드로 전환하고, 이유에 맞는 안내를 보여준다.
+        function showLocalMode(kind, detail) {
+            notionConnected = false;
+            const messages = {
+                demo: '👀 샘플 화면입니다. 타이머는 그대로 사용해볼 수 있어요.<br>작업 추가·목록 같은 Notion 연동 기능은 <b>내 위젯 주소로 교체</b>하면 사용할 수 있습니다.',
+                nokey: '🔑 주소 끝에 <b>?key=설정한비밀번호</b>를 붙여주세요. (Vercel의 <b>WIDGET_SECRET</b> 값)<br>지금은 기본 타이머로만 동작 중입니다.',
+                badkey: '🔑 인증 키가 맞지 않습니다.<br>주소의 <b>?key=</b> 값이 Vercel의 <b>WIDGET_SECRET</b> 값과 같은지 확인해주세요.',
+                notconfigured: '🔌 Notion 연동이 설정되지 않아 기본 타이머로만 동작 중입니다.<br>내 Notion Pomodoro DB와 연동하려면 위젯 배포 시 <b>NOTION_TOKEN</b> / <b>POMODORO_DB_ID</b>를 입력해주세요.',
+                error: '⚠️ Notion 연결 중 오류가 발생해 기본 타이머로만 동작 중입니다.<br><b>Pomodoro DB · Daily DB · Action DB에 통합(Connections) 연결이 빠지지 않았는지</b> 먼저 확인해주세요.<br>그 외에 토큰·DB ID, 템플릿 속성 구성도 확인이 필요합니다.' + (detail ? '<br><span style="opacity:0.85;">' + escapeHtml(detail) + '</span>' : ''),
+                network: '⚠️ 서버에 연결할 수 없어 기본 타이머로만 동작 중입니다.'
+            };
+            document.getElementById('pomo-local-note-text').innerHTML = messages[kind] || messages.network;
+            setSyncAreaVisible(false);
+        }
+
         async function loadPomodoroTasks() {
+            if (isDemo) { showLocalMode('demo'); return; }
+            if (!secretKey) { showLocalMode('nokey'); return; }
+
             const listEl = document.getElementById('pomo-all-list');
             listEl.innerHTML = '<div style="color:var(--text-sub); text-align:center; padding:10px 0;">⏳ 로딩 중...</div>';
 
             try {
                 const res = await fetch(`/api/pomodoro?mode=list&key=${encodeURIComponent(secretKey)}&t=${Date.now()}`);
+                if (res.status === 401) { showLocalMode('badkey'); return; }
                 const data = await res.json();
 
                 if (!data.success) {
-                    // 키가 없거나(개인 인증 미설정) Notion 연동(NOTION_TOKEN/POMODORO_DB_ID)이 안 되어 있는 경우
-                    // -> 에러를 띄우지 않고 조용히 "기본 타이머" 모드로 전환한다.
-                    notionConnected = false;
-                    setSyncAreaVisible(false);
+                    showLocalMode(data.notConfigured ? 'notconfigured' : 'error', data.error);
                     return;
                 }
 
@@ -480,9 +498,7 @@
                 }
                 if (pomoTimerInterval) clearInterval(pomoTimerInterval); updatePomoTimers(); pomoTimerInterval = setInterval(updatePomoTimers, 1000);
             } catch (e) {
-                // 네트워크 오류도 동일하게 조용히 기본 타이머 모드로 전환
-                notionConnected = false;
-                setSyncAreaVisible(false);
+                showLocalMode('network');
             }
         }
 

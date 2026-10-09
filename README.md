@@ -26,7 +26,7 @@ Huinaology 노션 템플릿용 **뽀모도로 타이머 부가기능**입니다.
 ### STEP 2. 연동할 DB 준비하기 (휘나올로지 2027 이후 버전의 기본설정에 맞춰 진행됩니다.)
 > ⚠️ 위젯은 템플릿의 **기본 속성 이름·구조 그대로** 동작합니다. 속성 이름이나 DB 구성을 바꾸셨다면 연결되지 않는 기능이 생길 수 있으니, 기본 설정을 유지해주세요.
 
-1. Pomodoro DB, Daily DB 각각의 우측 상단 **[...] → [연결(Connections)] → STEP 1에서 만든 통합(Integration)** 을 추가합니다.
+1. **(자주 빠뜨리는 단계!)** Pomodoro DB, Daily DB 각각의 우측 상단 **[...] → [연결(Connections)] → STEP 1에서 만든 통합(Integration)** 을 추가합니다.
    Action 기능을 쓰신다면 **Action DB에도 같은 방법으로 통합을 연결**해주세요. (이 연결을 빼먹으면 "DB를 찾을 수 없다"는 오류가 나거나, Action 체크박스가 나타나지 않습니다.)
    체크박스를 고르고 새 작업을 추가하면, **같은 이름의 Action 페이지가 새 작업에 자동으로 연결**됩니다. (Action DB에 없는 항목은 연결되지 않고, 작업 추가는 정상적으로 됩니다.)
 2. 각 DB 페이지 우측 상단 **[...] → [Copy link]** 로 링크를 복사하면, URL 안에 32자리 DB ID가 들어있습니다. (예: `notion.so/xxxx/1234abcd...?v=...` 에서 `1234abcd...` 부분)
@@ -58,6 +58,8 @@ Huinaology 노션 템플릿용 **뽀모도로 타이머 부가기능**입니다.
 https://내프로젝트이름.vercel.app?key=mypomodoro123
 ```
 
+> ⚠️ 임베드 화면에 **"vercel.com이(가) 차단되었습니다"** 가 뜬다면, Vercel 프로젝트의 **Settings → Deployment Protection**에서 **Vercel Authentication**을 끄고 저장해주세요. 주소도 Domains에 표시된 `프로젝트이름.vercel.app` 형태를 사용해야 합니다.
+
 ## 🛠️ 업데이트 방법
 1. 이 저장소(https://github.com/huinaology/Huinaology-Pomodoro)에서 변경된 파일을 열어 전체 코드를 복사합니다.
 2. STEP 3에서 만들어진 내 Github 저장소로 이동해 동일한 파일을 열고, 우측 상단 연필 아이콘(Edit this file)으로 기존 코드를 지운 뒤 새 코드를 붙여넣습니다.
@@ -65,6 +67,7 @@ https://내프로젝트이름.vercel.app?key=mypomodoro123
 4. [Vercel 대시보드](https://vercel.com/dashboard)에서 해당 프로젝트의 **[Deployments] → [...] → [Redeploy]** 를 누르면 끝입니다.
 
 ## ❓문제가 생겼을 때
+- 위젯에 **"⚠️ Notion 연결 중 오류"** 가 뜬다면, 가장 먼저 **Pomodoro DB · Daily DB · Action DB 각각에 통합(Integration) 연결이 되어 있는지** 확인해주세요. (우측 상단 [...] → 연결(Connections)) 가장 흔하게 빠뜨리는 부분입니다. 오류 문구 아래에 노션이 알려준 원인이 함께 표시됩니다.
 - 위젯에 "🔌 Notion 연동이 설정되지 않아..." 안내만 계속 보인다면 `NOTION_TOKEN`/`POMODORO_DB_ID` 값이나 DB의 연결(Connections) 설정을 다시 확인해주세요.
 - Action 체크박스가 나타나지 않는다면 ① 템플릿의 기본 속성 구성을 바꾸지 않았는지, ② Action DB에 통합(Integration) 연결을 했는지 확인해주세요.
 - 체크박스는 보이는데 Action이 연결되지 않는다면, Action DB의 항목 이름을 템플릿 기본 설정에서 바꾸지 않았는지 확인해주세요. (띄어쓰기나 철자가 다르면 연결되지 않습니다.)
