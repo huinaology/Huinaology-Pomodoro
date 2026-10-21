@@ -239,11 +239,11 @@ module.exports = async (req, res) => {
                     }
                 }
 
-                await notion.pages.create({
+                const created = await notion.pages.create({
                     parent: { database_id: POMODORO_DB_ID },
                     properties
                 });
-                return res.status(200).json({ success: true });
+                return res.status(200).json({ success: true, pageId: created.id });
             } catch (createErr) {
                 console.error("Notion Create Error:", createErr);
                 return res.status(500).json({ success: false, error: createErr.message });

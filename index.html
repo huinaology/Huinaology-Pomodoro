@@ -7,44 +7,62 @@
     <title>Huinaology Pomodoro Widget</title>
     <style>
         :root {
-            --bg-color: #b44e54; --accent-color: #f3ecd1; --accent-hover: #720000; --secondary-accent: #f3ecd1;
-            --text-main: #6D6373; --text-sub: #A89FAA; --border-color: #f3ecd1; --card-bg: #FFFFFF;
-            --main-bg: #FFF; --success-bg: #E3F6F3; --success-text: #2D8B7E; --fail-bg: #FBE8E8;
-            --fail-text: #C55353; --warn-bg: #FFF3E0; --warn-text: #E65100; --log-bg: #2D2D2D; --log-text: #E0E0E0;
-            --pomo-timer-text: #b44e54; --btn-text: #720000; --btn-text-hover: #f3ecd1;
+            /* 🍅 토마토 레드 / 버터 노랑 버튼 / 연한 초록 꼭지 */
+            --tomato: #C8454C; --tomato-band: #A8333B; --leaf: #7CC27F; --leaf-dark: #4FA361;
+            --btn-bg: #FDEBAE; --btn-bg-hover: #F2A0A4; --btn-text: #A63A42; --btn-text-hover: #7E1F27;
+            --text-main: #6A5656; --text-sub: #AA9A9A; --border-color: #F7EBC9; --card-bg: #FFFFFF; --main-bg: #FFFFFF; --secondary-accent: #FCEFC4; --accent-color: #F7DD8F;
+            --success-bg: #E3F6F3; --success-text: #2D8B7E; --fail-bg: #FBE8E8; --fail-text: #C55353; --warn-bg: #FFF3E0; --warn-text: #E65100;
+            --pomo-timer-text: #C8454C;
         }
-
         [data-theme="dark"] {
-            --text-main: #E0D8E8; --text-sub: #9B93A0; --card-bg: #2A2235;
-            --main-bg: #1E1828; --success-bg: #1A332E; --success-text: #5ED4B9; --fail-bg: #3A1E1E;
-            --fail-text: #F28B8B; --warn-bg: #3A2E1A; --warn-text: #FFB74D; --log-bg: #12101A; --log-text: #C8C0D0;
+            --tomato: #7A2F35; --tomato-band: #5E2228; --leaf: #6FA577; --leaf-dark: #578C60;
+            --btn-bg: #EBD99B; --btn-bg-hover: #D98A8E; --btn-text: #5C3F1E; --btn-text-hover: #3A1417;
+            --text-main: #F2E4E2; --text-sub: #B6A0A0; --border-color: #5B4540; --card-bg: #382A2E; --main-bg: #2A2125; --secondary-accent: #6D5A2F; --accent-color: #BFA55C;
+            --success-bg: #1A332E; --success-text: #5ED4B9; --fail-bg: #3A1E1E; --fail-text: #F28B8B; --warn-bg: #3A2E1A; --warn-text: #FFB74D;
+            --pomo-timer-text: #FF9DA2;
         }
+        /* ☕ 휴식 모드: 같은 구조에서 빨간 부분만 보라로 교체 */
+        [data-pomo="break"] { --tomato: #8E7DC0; --tomato-band: #6E5DA3; --btn-bg-hover: #C9BDF0; --btn-text: #5E5391; --btn-text-hover: #4A4070; --pomo-timer-text: #7F70B8; }
+        [data-theme="dark"][data-pomo="break"] { --tomato: #5A4F85; --tomato-band: #41385F; --btn-bg-hover: #8F82C2; --btn-text: #4A3F6E; --btn-text-hover: #20183F; --pomo-timer-text: #C7BEE8; }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background-color 0.4s ease; }
-
-        /* ✨ 상단 바 없이, 바깥 여백(margin)이 곧 테두리처럼 보이도록 카드 하나만 둔다 */
-        .main { flex: 1; padding: 16px; overflow-y: auto; overflow-x: hidden; background: var(--main-bg); border-radius: 16px; margin: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; position: relative; z-index: 8; }
-        .main::-webkit-scrollbar { width: 5px; } .main::-webkit-scrollbar-thumb { background-color: var(--secondary-accent); border-radius: 10px; }
-
-        .header-inline { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color); }
-        .header-inline h2 { font-size: 16px; margin: 0; font-weight: 700; letter-spacing: -0.5px; color: var(--text-main); }
-
+        html, body { height: 100%; }
+        body { margin: 0; padding: 0; background: transparent; overflow: hidden; color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         h3 { font-size: 12px; margin: 0 0 12px 0; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card { background: var(--card-bg); padding: 16px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); border: 1px solid var(--border-color); margin-bottom: 14px; transition: 0.2s; }
+        .ico { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 0; }
+        .ico > * { display: block; }
+        input[type="checkbox"] { accent-color: var(--tomato); }
 
-        /* ☾ 휴식 버튼 옆에 나란히 붙는 다크모드 토글 (더이상 화면 우상단 고정이 아님) */
-        .theme-toggle { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--secondary-accent); background: var(--card-bg); color: var(--text-main); font-size: 12px; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; }
-        .theme-toggle:hover { transform: scale(1.15); border-color: var(--accent-color); color: var(--accent-color); }
+        /* 🍅 토마토를 가운데 선에서 반으로 잘라 위젯 위·아래에 붙인 모양 (단색·그림자 없음).
+           위 뚜껑 = 꼭지 + 눈금, 아래 뚜껑 = 화살표(▲). 가운데 흰 창은 사각형이고 안쪽만 스크롤된다. */
+        .tomato { height: 100%; display: flex; flex-direction: column; }
+        .tomato-cap { position: relative; flex: none; background: var(--tomato); transition: background 0.4s ease; }
+        .tomato-top { height: 54px; border-bottom: 4px solid var(--tomato-band); border-radius: 46% 46% 0 0 / 100% 100% 0 0; }
+        .tomato-bottom { height: 26px; border-top: 4px solid var(--tomato-band); border-radius: 0 0 46% 46% / 0 0 100% 100%; }
+        .tomato-ticks { position: absolute; left: 50%; bottom: 3px; width: 150px; height: 19px; transform: translateX(-50%); pointer-events: none; }
+        .tomato-calyx { position: absolute; top: 3px; left: 50%; width: 58px; height: 26px; transform: translateX(-50%); pointer-events: none; }
+        .tomato-arrow { position: absolute; top: 5px; left: 50%; width: 22px; height: 12px; transform: translateX(-50%); pointer-events: none; }
+        .tomato-mid { flex: 1 1 auto; min-height: 0; display: flex; padding: 0 10px; background: var(--tomato); transition: background 0.4s ease; }
+        .tomato-window { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 14px 16px 16px; background: var(--main-bg); border-radius: 6px; scrollbar-width: thin; scrollbar-color: var(--accent-color) transparent; }
+        .tomato-window::-webkit-scrollbar { width: 6px; }
+        .tomato-window::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 6px; }
+        .pomo-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color); }
+        .pomo-head h2 { font-size: 16px; margin: 0; font-weight: 700; letter-spacing: -0.5px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
 
+        #pomoStartBtn, #pomoPauseBtn, #pomoResetBtn { width: auto !important; flex: 1 1 0; min-width: 0; max-width: 88px; padding-left: 6px; padding-right: 6px; }
+        @media (max-width: 440px) {
+            .tomato-top { height: 50px; }
+            .tomato-mid { padding: 0 7px; }
+            .tomato-window { padding: 12px 12px 14px; }
+        }
         .btn { width: 100%; padding: 10px 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; margin-bottom: 8px; letter-spacing: -0.3px; word-break: keep-all; white-space: normal; height: auto; line-height: 1.4; }
-        .btn-primary { background-color: var(--accent-color); color: var(--btn-text, white); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .btn-primary:hover { background-color: var(--accent-hover); color: var(--btn-text-hover, white); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); }
+        .btn-ico { display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-primary { background-color: var(--btn-bg); color: var(--btn-text); }
+        .btn-primary:hover { background-color: var(--btn-bg-hover); color: var(--btn-text-hover); }
         .btn-secondary { background-color: var(--card-bg); border: 2px solid var(--secondary-accent); color: var(--text-main); }
-        .btn-secondary:hover { background-color: var(--bg-color); border-color: var(--accent-color); color: var(--accent-color); transform: translateY(-1px); }
-        .btn-secondary:disabled { opacity: 0.5; cursor: default; }
-
-        input[type="checkbox"] { accent-color: var(--accent-color); }
+        .btn-secondary:hover { background-color: var(--main-bg); border-color: var(--btn-bg-hover); color: var(--btn-text); }
+        .btn-secondary:disabled, .btn-primary:disabled { opacity: 0.5; cursor: default; }
+        .shimeji-size-btn.active { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-text); }
 
         /* 🐹 타이머 창 안을 돌아다니는 캐릭터 */
         #shimejiStage > div { will-change: left, transform; }
@@ -55,92 +73,106 @@
         @keyframes shimejiBobWalk { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 2px; } }
         @keyframes shimejiBobHurry { 0%, 100% { margin-bottom: 0; } 50% { margin-bottom: 7px; } }
         @keyframes shimejiBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.92); } }
-        .shimeji-size-btn.active { background: var(--accent-color); border-color: var(--accent-color); color: var(--btn-text, white); }
-
-        @media (max-width: 380px) {
-            .header-inline h2 { font-size: 15px; }
-            .card { padding: 12px; } h3 { margin-bottom: 10px; }
-            .btn { font-size: 12px; padding: 8px 10px; }
-        }
     </style>
+    <!-- 아이콘: Lucian Icons (MIT) - vendor/lucian-icons/LICENSE 참고 -->
+    <script type="module">
+        ['bed', 'book', 'briefcase', 'check', 'clock', 'close', 'coffee', 'dumbbell', 'flame', 'graduation', 'pause', 'paw', 'play', 'plus', 'refresh', 'settings', 'stopwatch', 'tag', 'undo', 'verified']
+            .forEach(name => import(`./vendor/lucian-icons/${name}.js`).catch(err => console.warn('lucian icon load failed:', name, err)));
+    </script>
 </head>
 
 <body>
-
-    <div class="main">
-        <div id="tab-pomodoro" class="section active">
-            <div class="header-inline" style="justify-content: space-between; align-items: center;">
-                <h2>🍅 Pomodoro Timer</h2>
-                <div style="display:flex; gap:6px; align-items:center;">
-                    <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="forcePomoMode(true)" title="집중 시간으로 수동 전환">🍅 집중</button>
-                    <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="forcePomoMode(false)" title="휴식 시간으로 수동 전환">☕ 휴식</button>
-                    <button class="btn-secondary" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px;" onclick="openShimejiSettings()" title="캐릭터 설정">⚙️</button>
-                    <button class="theme-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="라이트/다크 모드 전환">🌙</button>
-                </div>
-            </div>
-
-            <!-- 타이머 카드의 아래 점선이 곧 캐릭터가 걷는 '바닥'이다. 캐릭터는 글자/버튼 뒤(배경 레이어)를 지나다닌다. -->
-            <div style="margin-bottom: 0; text-align: center; padding: 0 12px 26px 12px; position: relative; overflow: hidden; border-radius: 12px; border-bottom: 1px dashed var(--border-color);">
-                <div id="shimejiStage" style="position:absolute; inset:0; z-index:0; pointer-events:none;"></div>
-
-                <div style="position:relative; z-index:1;">
-                    <div id="pomoTimerDisplay" style="font-size: 48px; font-weight: 900; color: var(--pomo-timer-text); font-variant-numeric: tabular-nums; margin: 4px 0;">25:00</div>
-
-                    <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
-                        <button class="btn btn-primary" style="width:80px; margin:0;" onclick="masterStartTimer()" id="pomoStartBtn">Start</button>
-                        <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterPauseTimer()" id="pomoPauseBtn">Pause</button>
-                        <button class="btn btn-secondary" style="width:80px; margin:0;" onclick="masterResetTimer()" id="pomoResetBtn">Reset</button>
-                    </div>
-
-                    <div style="font-size:11px; color:var(--text-sub); display:flex; gap:12px; justify-content:center; align-items:center;">
-                        <label>집중: <input type="number" id="pomoFocusInput" value="25" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
-                        <label>휴식: <input type="number" id="pomoBreakInput" value="5" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🔌 Notion 미연동 시(개인 ID 미입력) 이 안내만 보이고, 아래 작업 목록 영역은 통째로 숨겨진다 -->
-            <div id="pomo-local-note" style="display:none; margin: 12px 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--bg-color); border: 1px dashed var(--border-color); font-size: 11px; color: #fff; line-height: 1.5; text-align:center;">
-                <span id="pomo-local-note-text"></span>
-            </div>
-
-            <div id="pomo-sync-area">
-                <div id="pomo-new-task-card" style="margin-bottom: 16px; padding: 16px 4px 0 4px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-                        <h3 style="margin:0; font-size:14px; font-weight:600; color:var(--text-main); white-space:nowrap;">새 작업 추가 (New Task)</h3>
-                        <!-- Action 체크박스. 값(공부/업무/…)은 Notion Action DB의 같은 이름 페이지와 연결된다. Action 속성을 쓸 수 있을 때만 보인다. -->
-                        <div id="pomo-action-options" style="display:none; flex-wrap:wrap; gap:8px; font-size:11px;">
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="공부" style="width:13px; height:13px;"> 공부</label>
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="업무" style="width:13px; height:13px;"> 업무</label>
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="독서" style="width:13px; height:13px;"> 독서</label>
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="운동" style="width:13px; height:13px;"> 운동</label>
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="수면" style="width:13px; height:13px;"> 수면</label>
+    <div class="tomato">
+        <div class="tomato-cap tomato-top">
+            <svg class="tomato-ticks" viewBox="0 0 150 19" aria-hidden="true">
+                <g fill="#fff" opacity="0.92">
+                    <rect x="13" y="11" width="4" height="8" rx="2"/><rect x="33" y="7" width="4" height="12" rx="2"/><rect x="53" y="11" width="4" height="8" rx="2"/><rect x="73" y="3" width="4" height="16" rx="2"/><rect x="93" y="11" width="4" height="8" rx="2"/><rect x="113" y="7" width="4" height="12" rx="2"/><rect x="133" y="11" width="4" height="8" rx="2"/>
+                </g>
+            </svg>
+            <svg class="tomato-calyx" viewBox="0 0 64 28" aria-hidden="true">
+                <path d="M32 27 C20 27 6 22 4 12 C3 5 8 2 13 3 C24 5 32 12 32 27Z" fill="var(--leaf)"/>
+                <path d="M32 27 C44 27 58 22 60 12 C61 5 56 2 51 3 C40 5 32 12 32 27Z" fill="var(--leaf-dark)"/>
+            </svg>
+        </div>
+        <div class="tomato-mid">
+            <div class="tomato-window">
+                <div id="tab-pomodoro">
+                    <div class="pomo-head">
+                        <h2><i data-li="stopwatch" data-size="20"></i> Pomodoro Timer</h2>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <button class="btn-secondary btn-ico" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px; cursor:pointer; font-weight:700;" onclick="forcePomoMode(true)" title="집중 시간으로 수동 전환"><i data-li="flame" data-size="14"></i> 집중</button>
+                            <button class="btn-secondary btn-ico" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px; cursor:pointer; font-weight:700;" onclick="forcePomoMode(false)" title="휴식 시간으로 수동 전환"><i data-li="coffee" data-size="14"></i> 휴식</button>
+                            <button class="btn-secondary btn-ico" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px; cursor:pointer;" onclick="openShimejiSettings()" title="캐릭터 설정" aria-label="캐릭터 설정"><i data-li="settings" data-size="14"></i></button>
+                            <button class="btn-secondary btn-ico" id="darkModeBtn" style="padding:4px 8px; font-size:11px; width:auto; margin:0; border-radius:6px; cursor:pointer;" onclick="toggleDarkMode()" title="라이트/다크 모드 전환" aria-label="라이트/다크 모드 전환">🌙</button>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="pomoTitle" placeholder="새 작업 이름 입력 후 추가..." style="flex:1; padding:10px; border:1px solid var(--border-color); border-radius:10px; font-size:13px; background:var(--card-bg); color:var(--text-main);" onkeypress="if(event.key==='Enter') createNewPomodoroTask()">
-                        <button class="btn btn-primary" id="pomoNewBtn" style="width: 60px; margin-bottom: 0;" onclick="createNewPomodoroTask()">Add</button>
-                    </div>
-                </div>
 
-                <div id="pomo-list-card" style="margin-bottom: 0; padding: 0 4px;">
-                    <h3 style="display: flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
-                        <span>전체 작업 목록 (Tasks - 복수 연동 및 개별 재생 지원)</span>
-                        <button class="btn-secondary" style="padding:4px 8px; font-size:10px; width:auto; margin:0; border-radius:6px;" onclick="loadPomodoroTasks()">새로고침</button>
-                    </h3>
-                    <div id="pomo-all-list" style="font-size: 13px;">
-                        <div style="color:var(--text-sub); text-align:center; padding:10px 0;">⏳ 로딩 중...</div>
+                    <!-- 타이머 카드의 아래 점선이 곧 캐릭터가 걷는 '바닥'이다. 캐릭터는 글자/버튼 뒤(배경 레이어)를 지나다닌다. -->
+                    <div style="margin-bottom: 0; text-align: center; padding: 0 12px 26px 12px; position: relative; overflow: hidden; border-radius: 12px; border-bottom: 1px dashed var(--border-color);">
+                        <div id="shimejiStage" style="position:absolute; inset:0; z-index:0; pointer-events:none;"></div>
+
+                        <div style="position:relative; z-index:1;">
+                            <div id="pomoTimerDisplay" style="font-size: 48px; font-weight: 900; color: var(--pomo-timer-text); font-variant-numeric: tabular-nums; margin: 4px 0;">25:00</div>
+
+                            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+                                <button class="btn btn-primary btn-ico" style="width:80px; margin:0;" onclick="masterStartTimer()" id="pomoStartBtn"><i data-li="play" data-size="14"></i> Start</button>
+                                <button class="btn btn-secondary btn-ico" style="width:80px; margin:0;" onclick="masterPauseTimer()" id="pomoPauseBtn"><i data-li="pause" data-size="14"></i> Pause</button>
+                                <button class="btn btn-secondary btn-ico" style="width:80px; margin:0;" onclick="masterResetTimer()" id="pomoResetBtn"><i data-li="undo" data-size="14"></i> Reset</button>
+                            </div>
+
+                            <div style="font-size:11px; color:var(--text-sub); display:flex; gap:12px; justify-content:center; align-items:center;">
+                                <label>집중: <input type="number" id="pomoFocusInput" value="25" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
+                                <label>휴식: <input type="number" id="pomoBreakInput" value="5" onchange="updatePomoSettings()" style="width:40px; padding:2px; border:1px solid var(--border-color); border-radius:4px; text-align:center; background:transparent; color:inherit;">분</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔌 Notion 미연동 시(개인 ID 미입력) 이 안내만 보이고, 아래 작업 목록 영역은 통째로 숨겨진다 -->
+                    <div id="pomo-local-note" style="display:none; margin: 12px 4px 4px 4px; padding: 10px 12px; border-radius: 10px; background: var(--tomato); border: 1px dashed var(--tomato-band); font-size: 11px; color: #fff; line-height: 1.5; text-align:center;">
+                        <span id="pomo-local-note-text"></span>
+                    </div>
+
+                    <div id="pomo-sync-area">
+                        <div id="pomo-new-task-card" style="margin-bottom: 16px; padding: 16px 4px 0 4px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                                <h3 style="margin:0; font-size:14px; font-weight:600; color:var(--text-main); white-space:nowrap;">새 작업 추가 (New Task)</h3>
+                                <!-- Action 체크박스. 값(공부/업무/…)은 Notion Action DB의 같은 이름 페이지와 연결된다. Action 속성을 쓸 수 있을 때만 보인다. -->
+                                <div id="pomo-action-options" style="display:none; flex-wrap:wrap; gap:8px; font-size:11px;">
+                                    <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="공부" style="width:13px; height:13px;"> 공부</label>
+                                    <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="업무" style="width:13px; height:13px;"> 업무</label>
+                                    <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="독서" style="width:13px; height:13px;"> 독서</label>
+                                    <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="운동" style="width:13px; height:13px;"> 운동</label>
+                                    <label style="display:flex; align-items:center; gap:3px; cursor:pointer; color:var(--text-sub);"><input type="checkbox" class="pomo-action-check" value="수면" style="width:13px; height:13px;"> 수면</label>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="pomoTitle" placeholder="새 작업 이름 입력 후 추가..." style="flex:1; min-width:0; padding:10px; border:1px solid var(--border-color); border-radius:10px; font-size:13px; background:var(--card-bg); color:var(--text-main);" onkeypress="if(event.key==='Enter') createNewPomodoroTask()">
+                                <button class="btn btn-primary btn-ico" id="pomoNewStartBtn" style="width: 60px; margin-bottom: 0;" onclick="createNewPomodoroTask(true)" title="추가 후 바로 시작" aria-label="추가 후 바로 시작"><i data-li="play" data-size="22"></i></button>
+                                <button class="btn btn-secondary btn-ico" id="pomoNewBtn" style="width: 60px; margin-bottom: 0;" onclick="createNewPomodoroTask()" title="추가" aria-label="추가"><i data-li="plus" data-size="22"></i></button>
+                            </div>
+                        </div>
+
+                        <div id="pomo-list-card" style="margin-bottom: 0; padding: 0 4px;">
+                            <h3 style="display: flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
+                                <span>전체 작업 목록 (Tasks - 복수 연동 및 개별 재생 지원)</span>
+                                <button class="btn-secondary btn-ico" style="padding:4px 8px; font-size:10px; width:auto; margin:0; border-radius:6px;" onclick="loadPomodoroTasks()" title="새로고침" aria-label="새로고침"><i data-li="refresh" data-size="16"></i></button>
+                            </h3>
+                            <div id="pomo-all-list" style="font-size: 13px;">
+                                <div style="color:var(--text-sub); padding:10px 0; display:flex; align-items:center; justify-content:center; gap:4px;"><i data-li="clock" data-size="14"></i> 로딩 중...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="tomato-cap tomato-bottom"><svg class="tomato-arrow" viewBox="0 0 22 12" aria-hidden="true"><polyline points="3,10 11,3 19,10" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <!-- 🐹 캐릭터 설정 모달 -->
     <div id="shimeji-settings-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center; padding:20px;">
         <div style="background:var(--card-bg); border-radius:16px; padding:18px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,0.25);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <h2 style="font-size:15px; margin:0; color:var(--text-main);">🐹 캐릭터 설정</h2>
+                <h2 style="font-size:15px; margin:0; color:var(--text-main); display:flex; align-items:center; gap:6px;"><i data-li="paw" data-size="20"></i> 캐릭터 설정</h2>
                 <button onclick="closeShimejiSettings()" style="border:none; background:transparent; font-size:18px; cursor:pointer; color:var(--text-sub); padding:2px 6px;">✕</button>
             </div>
             <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px; line-height:1.6;">
@@ -178,9 +210,23 @@
 
         let notionConnected = false; // Notion 연동 여부. mode=list 응답으로 판별한다.
 
+        // 아이콘(Lucian Icons, MIT): HTML의 <i data-li="이름" data-size="숫자"></i> 자리표시를 실제 아이콘으로 바꾼다.
+        function liIcon(name, size = 16) {
+            if (!name) return '';
+            return `<span class="ico"><lucian-${name} size="${size}"></lucian-${name}></span>`;
+        }
+        function hydrateLiIcons(root) {
+            (root || document).querySelectorAll('i[data-li]').forEach(el => {
+                const holder = document.createElement('span');
+                holder.innerHTML = liIcon(el.dataset.li, parseInt(el.dataset.size, 10) || 16);
+                if (holder.firstElementChild) el.replaceWith(holder.firstElementChild);
+            });
+        }
+        hydrateLiIcons();
+
         window.onload = function () {
             if (localStorage.getItem('darkMode') === 'true') { document.documentElement.setAttribute('data-theme', 'dark'); const btn = document.getElementById('darkModeBtn'); if (btn) btn.innerText = '☀️'; }
-            applyPomoModeTheme(true);
+            applyPomoModeTheme();
             initShimeji();
             updatePomoDisplay();
             loadPomodoroTasks();
@@ -192,7 +238,6 @@
             const btn = document.getElementById('darkModeBtn');
             if (isDark) { root.removeAttribute('data-theme'); if (btn) btn.innerText = '🌙'; localStorage.setItem('darkMode', 'false'); }
             else { root.setAttribute('data-theme', 'dark'); if (btn) btn.innerText = '☀️'; localStorage.setItem('darkMode', 'true'); }
-            applyPomoModeTheme(true);
         }
 
         // ==========================================
@@ -236,35 +281,15 @@
         }
 
         // 집중/휴식에 따라 위젯 전체 색상을 바꾼다. (탭이 하나뿐이라 항상 즉시 적용)
-        function applyPomoModeTheme(force) {
-            const root = document.documentElement; const isDark = root.getAttribute('data-theme') === 'dark';
-            if (!isFocusMode) {
-                root.style.setProperty('--bg-color', isDark ? '#2B2740' : '#72649f');
-                root.style.setProperty('--accent-color', '#f3ecd1');
-                root.style.setProperty('--accent-hover', isDark ? '#3D3658' : '#4A4270');
-                root.style.setProperty('--secondary-accent', '#f3ecd1');
-                root.style.setProperty('--border-color', isDark ? '#453D60' : '#f3ecd1');
-                root.style.setProperty('--btn-text', '#4A4270');
-                root.style.setProperty('--btn-text-hover', '#f3ecd1');
-                root.style.setProperty('--pomo-timer-text', isDark ? '#C7BEE8' : '#5A4E82');
-            } else {
-                root.style.setProperty('--bg-color', isDark ? '#3A1A1C' : '#b44e54');
-                root.style.setProperty('--accent-color', '#f3ecd1');
-                root.style.setProperty('--accent-hover', isDark ? '#5A2A2C' : '#720000');
-                root.style.setProperty('--secondary-accent', '#f3ecd1');
-                root.style.setProperty('--border-color', isDark ? '#5A3A3C' : '#f3ecd1');
-                root.style.setProperty('--btn-text', '#720000');
-                root.style.setProperty('--btn-text-hover', '#f3ecd1');
-                root.style.setProperty('--pomo-timer-text', '#b44e54');
-            }
-        }
+        // 색은 위쪽 CSS가 정한다. 집중이면 토마토(빨강), 휴식이면 보라.
+        function applyPomoModeTheme() { document.documentElement.setAttribute('data-pomo', isFocusMode ? 'focus' : 'break'); }
 
         function forcePomoMode(focus) {
             isFocusMode = focus;
             const focusMins = parseInt(document.getElementById('pomoFocusInput').value) || 25;
             const breakMins = parseInt(document.getElementById('pomoBreakInput').value) || 5;
             pomoTimeLeft = (isFocusMode ? focusMins : breakMins) * 60;
-            applyPomoModeTheme(true);
+            applyPomoModeTheme();
             if (isPomoRunning) {
                 masterPauseTimer();
             } else {
@@ -333,7 +358,7 @@
             } catch (e) {
                 alert('네트워크 오류 발생: ' + e.message);
             }
-            btn.innerText = 'Start';
+            btn.innerHTML = liIcon('play', 14) + ' Start';
             btn.disabled = false;
         }
 
@@ -432,10 +457,10 @@
             if (box) box.style.display = enabled ? 'flex' : 'none';
         }
 
-        const POMO_ACTION_ICONS = { '공부': '📚', '업무': '💼', '독서': '📖', '운동': '💪', '수면': '😴' };
+        const POMO_ACTION_ICONS = { '공부': 'graduation', '업무': 'briefcase', '독서': 'book', '운동': 'dumbbell', '수면': 'bed' };
         function renderActionBadges(actions) {
             if (!actions || actions.length === 0) return '';
-            return actions.map(a => `<span style="font-size:11px; color:var(--text-sub); font-weight:400; margin-left:6px;">${POMO_ACTION_ICONS[a] || '🏷️'} ${escapeHtml(a)}</span>`).join('');
+            return actions.map(a => `<span style="font-size:11px; color:var(--text-sub); font-weight:400; margin-left:6px; white-space:nowrap;">${liIcon(POMO_ACTION_ICONS[a] || 'tag', 13)} ${escapeHtml(a)}</span>`).join('');
         }
 
         function setSyncAreaVisible(visible) {
@@ -465,7 +490,7 @@
             if (!secretKey) { showLocalMode('nokey'); return; }
 
             const listEl = document.getElementById('pomo-all-list');
-            listEl.innerHTML = '<div style="color:var(--text-sub); text-align:center; padding:10px 0;">⏳ 로딩 중...</div>';
+            listEl.innerHTML = `<div style="color:var(--text-sub); padding:10px 0; display:flex; align-items:center; justify-content:center; gap:4px;">${liIcon('clock', 14)} 로딩 중...</div>`;
 
             try {
                 const res = await fetch(`/api/pomodoro?mode=list&key=${encodeURIComponent(secretKey)}&t=${Date.now()}`);
@@ -520,7 +545,7 @@
                                     <label style="cursor:pointer; display:flex; align-items:center; background:rgba(45,139,126,0.1); padding:4px; border-radius:4px;" title="타이머와 연동하기">
                                         <input type="checkbox" ${linkCheckedAttr} onchange="toggleTaskLink(this, '${t.id}')" style="width:14px; height:14px; cursor:pointer; margin:0;">
                                     </label>
-                                    <button class="btn btn-primary" style="width:auto; margin:0; padding:6px 10px; font-size:12px;" onclick="runIndividualAction('start_existing', '${t.id}')" title="개별 재생">▶️</button>
+                                    <button class="btn btn-primary btn-ico" style="width:auto; margin:0; padding:6px 10px; font-size:12px;" onclick="runIndividualAction('start_existing', '${t.id}')" title="개별 재생" aria-label="개별 재생">${liIcon('play', 16)}</button>
                                 </div>
                             </div>`;
                         } else if (t.type === 'active') {
@@ -536,8 +561,8 @@
                                     <label style="cursor:pointer; display:flex; align-items:center; background:rgba(45,139,126,0.1); padding:4px; border-radius:4px;" title="타이머와 연동하기">
                                         <input type="checkbox" ${linkCheckedAttr} onchange="toggleTaskLink(this, '${t.id}')" style="width:14px; height:14px; cursor:pointer; margin:0;">
                                     </label>
-                                    ${isPaused ? `<button class="btn btn-secondary" style="width:auto; margin:0; padding:6px 8px; font-size:11px; border-color:var(--accent-color);" onclick="runIndividualAction('resume', '${t.id}')" title="개별 재생">▶️</button>` : `<button class="btn btn-secondary" style="width:auto; margin:0; padding:6px 8px; font-size:11px;" onclick="runIndividualAction('hold', '${t.id}')" title="일시정지">⛔</button>`}
-                                    <button class="btn btn-primary" style="width:auto; margin:0; padding:6px 8px; font-size:11px;" onclick="runIndividualAction('finish', '${t.id}')" title="작업 완료(종료)">✔️</button>
+                                    ${isPaused ? `<button class="btn btn-secondary btn-ico" style="width:auto; margin:0; padding:6px 8px; font-size:11px; border-color:var(--accent-color);" onclick="runIndividualAction('resume', '${t.id}')" title="개별 재생" aria-label="개별 재생">${liIcon('play', 16)}</button>` : `<button class="btn btn-secondary btn-ico" style="width:auto; margin:0; padding:6px 8px; font-size:11px;" onclick="runIndividualAction('hold', '${t.id}')" title="일시정지" aria-label="일시정지">${liIcon('pause', 16)}</button>`}
+                                    <button class="btn btn-primary btn-ico" style="width:auto; margin:0; padding:6px 8px; font-size:11px;" onclick="runIndividualAction('finish', '${t.id}')" title="작업 완료(종료)" aria-label="작업 완료(종료)">${liIcon('check', 16)}</button>
                                 </div>
                             </div>`;
                         } else {
@@ -545,7 +570,7 @@
                             const h = Math.floor(diffSec / 3600); const m = Math.floor((diffSec % 3600) / 60); const s = diffSec % 60; let text = ''; if (h > 0) text += `${h}h `; if (h > 0 || m > 0) text += `${m}m `; text += `${s}s`;
                             return `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--secondary-accent); border:1px solid var(--accent-color); border-radius:8px; margin-bottom:8px;">
                                 <div style="display:flex; align-items:center; gap:8px;">
-                                    <span style="font-size:14px; margin-top:2px;">✅</span>
+                                    <span style="display:inline-flex; margin-top:2px;">${liIcon('verified', 18)}</span>
                                     <div style="display:flex; flex-direction:column; gap:2px;">
                                         <span><span style="font-weight:600; color:var(--text-main);">${t.title}</span>${renderActionBadges(t.action)}</span>
                                         <span style="font-size:11px; color:var(--text-sub);">${formatPomoTime(t.start)} ~ ${formatPomoTime(t.end)} <span style="margin:0 4px;">|</span> <span style="font-weight:600;">${text}</span></span>
@@ -577,7 +602,8 @@
             } catch (e) { alert('네트워크 오류 발생'); }
         }
 
-        async function createNewPomodoroTask() {
+        // startNow=true("추가 후 바로 시작"): 만든 작업을 타이머와 연동하고 바로 시작한다.
+        async function createNewPomodoroTask(startNow = false) {
             const input = document.getElementById('pomoTitle');
             const title = input.value.trim();
             if (!title) return alert('새 작업 이름을 입력해주세요.');
@@ -586,8 +612,11 @@
             const checkedActions = Array.from(actionChecks).filter(el => el.checked).map(el => el.value);
 
             input.disabled = true;
-            const btn = document.getElementById('pomoNewBtn');
-            btn.disabled = true;
+            const addBtn = document.getElementById('pomoNewBtn');
+            const addStartBtn = document.getElementById('pomoNewStartBtn');
+            const btn = startNow ? addStartBtn : addBtn; // 눌린 버튼에만 '...' 표시
+            addBtn.disabled = true;
+            addStartBtn.disabled = true;
             btn.innerText = '...';
 
             try {
@@ -602,6 +631,7 @@
                     input.value = '';
                     actionChecks.forEach(el => el.checked = false);
                     loadPomodoroTasks();
+                    if (startNow && data.pageId) await linkAndStartNewTask(data.pageId);
                 } else {
                     alert('생성 실패: ' + (data.error || '알 수 없는 에러'));
                 }
@@ -609,8 +639,26 @@
                 alert('네트워크 오류 발생');
             }
             input.disabled = false;
-            btn.disabled = false;
-            btn.innerText = 'Add';
+            addBtn.disabled = false;
+            addStartBtn.disabled = false;
+            addBtn.innerHTML = liIcon('plus', 22);
+            addStartBtn.innerHTML = liIcon('play', 22);
+            input.focus();
+        }
+
+        // 새로 만든 작업을 타이머와 연동하고 바로 시작한다.
+        async function linkAndStartNewTask(pageId) {
+            linkedTaskIds.add(pageId);
+            if (isPomoRunning) {
+                // 타이머가 이미 돌고 있으면 타이머는 그대로 두고 새 작업만 지금 시작
+                try {
+                    const encodedKey = encodeURIComponent(secretKey);
+                    await fetch(`/api/pomodoro?mode=start_existing&pageId=${pageId}&key=${encodedKey}`);
+                } catch (e) { console.log('Start new task error:', e); }
+                loadPomodoroTasks();
+            } else {
+                await masterStartTimer();
+            }
         }
 
         // ==========================================
@@ -783,7 +831,7 @@
                         const fullKey = `${id}_${slot.suffix}`;
                         return `
                             <div style="text-align:center;">
-                                <div id="shimejiThumb-${fullKey}" style="width:40px; height:40px; margin:0 auto 4px auto; border-radius:9px; background:var(--bg-color); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden;"></div>
+                                <div id="shimejiThumb-${fullKey}" style="width:40px; height:40px; margin:0 auto 4px auto; border-radius:9px; background:var(--main-bg); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden;"></div>
                                 <div style="font-size:9px; color:var(--text-sub); margin-bottom:2px;">${slot.label}</div>
                                 <button class="btn-secondary" style="padding:3px; font-size:9px; width:100%; margin:0 0 2px 0;" onclick="document.getElementById('shimejiInput-${fullKey}').click()">업로드</button>
                                 <button class="btn-secondary" style="padding:3px; font-size:9px; width:100%; margin:0;" onclick="removeShimejiImage('${fullKey}')">삭제</button>
