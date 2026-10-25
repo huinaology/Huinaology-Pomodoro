@@ -298,9 +298,26 @@
             }
         }
 
-        function toggleTaskLink(checkbox, pageId) {
-            if (checkbox.checked) linkedTaskIds.add(pageId);
-            else linkedTaskIds.delete(pageId);
+        // 연동된 작업 하나를 타이머에 맞춰 재생한다. 일시정지면 이어서, 미진행이면 새로 시작, 이미 진행 중이면 그대로 둔다.
+        function startOrResumeLinkedTask(pageId) {
+            const state = window.pomoTaskStates[pageId];
+            let action = 'start_existing';
+            if (state === 'paused') action = 'resume';
+            else if (state === 'running') return Promise.resolve();
+
+            return fetch(`/api/pomodoro?mode=${action}&pageId=${pageId}&key=${encodeURIComponent(secretKey)}`).then(res => res.json());
+        }
+
+        async function toggleTaskLink(checkbox, pageId) {
+            if (checkbox.checked) {
+                linkedTaskIds.add(pageId);
+                // 타이머가 이미 돌고 있는 중에 연동하면 Start를 다시 누를 수 없으므로(이미 실행 중), 연동 즉시 이 작업도 따라서 재생한다.
+                if (isPomoRunning && notionConnected) {
+                    try { await startOrResumeLinkedTask(pageId); } catch (e) { console.log('Link sync error:', e); }
+                }
+            } else {
+                linkedTaskIds.delete(pageId);
+            }
             loadPomodoroTasks();
         }
 
@@ -313,16 +330,7 @@
 
             try {
                 if (notionConnected && linkedTaskIds.size > 0) {
-                    const encodedKey = encodeURIComponent(secretKey);
-                    const promises = Array.from(linkedTaskIds).map(pageId => {
-                        const state = window.pomoTaskStates[pageId];
-                        let action = 'start_existing';
-                        if (state === 'paused') action = 'resume';
-                        else if (state === 'running') return Promise.resolve();
-
-                        return fetch(`/api/pomodoro?mode=${action}&pageId=${pageId}&key=${encodedKey}`).then(res => res.json());
-                    });
-                    await Promise.all(promises);
+                    await Promise.all(Array.from(linkedTaskIds).map(startOrResumeLinkedTask));
                 }
 
                 isPomoRunning = true;
